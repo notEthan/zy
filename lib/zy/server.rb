@@ -57,8 +57,12 @@ module Zy
         recv_rc = server_socket.recv_string(request_s)
         debug({:server_socket => "recvd (#{recv_rc}) #{request_s}"})
         raise(ServerError, "server socket failed to recv") if recv_rc < 0
-        request = JSON.parse(request_s)
-        reply = app.call(request)
+        request = Request.new(request_s)
+        if request.error_status
+          reply = {'status' => request.error_status}
+        else
+          reply = app.call(request)
+        end
         reply_s = JSON.generate(reply)
         debug({:server_socket => "sending #{reply_s}"})
         send_rc = server_socket.send_string(reply_s)
