@@ -27,12 +27,17 @@ describe(Zy::Server) do
     end
   end
 
-  it('connects') do
-    send_rc = client_socket.send_string('{}')
+  def request_s(request_s)
+    send_rc = client_socket.send_string(request_s)
     assert(send_rc >= 0)
     reply_s = ''
     recv_rc = client_socket.recv_string(reply_s)
     assert(recv_rc >= 0)
+    reply_s
+  end
+
+  it 'requests and replies' do
+    reply_s = request_s '{}'
     reply = JSON.parse(reply_s)
   end
 end
