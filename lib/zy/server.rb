@@ -28,11 +28,11 @@ module Zy
         debug({:server_socket => {:curve => 'setting to server'}})
         rc = server_socket.setsockopt(ZMQ::CURVE_SERVER, 1)
         debug({:server_socket => {:curve => 'set to server'}})
-        raise(ServerError, "failed to set server socket to curve server") if rc < 0
+        raise(ServerError, "failed to set server socket to curve server (errno = #{ZMQ::Util.errno})") if rc < 0
         debug({:server_socket => {:curve => 'setting private key'}})
         server_socket.setsockopt(ZMQ::CURVE_SECRETKEY, @options['server_private_key'])
         debug({:server_socket => {:curve => 'set private key'}})
-        raise(ServerError, "failed to set server socket curve secret key") if rc < 0
+        raise(ServerError, "failed to set server socket curve secret key (errno = #{ZMQ::Util.errno})") if rc < 0
       else
         debug({:server_socket => {:curve => 'private key not specified'}})
       end
@@ -41,12 +41,12 @@ module Zy
         debug({:server_socket => "binding #{@options['bind']}"})
         bind_rc = server_socket.bind(@options['bind'])
         debug({:server_socket => "bound #{@options['bind']}"})
-        raise(ServerError, "failed to bind server socket to #{@options['bind']}") if bind_rc < 0
+        raise(ServerError, "failed to bind server socket to #{@options['bind']} (errno = #{ZMQ::Util.errno})") if bind_rc < 0
       elsif @options['connect']
         debug({:server_socket => "connecting #{@options['connect']}"})
         connect_rc = server_socket.connect(@options['connect'])
         debug({:server_socket => "connected #{@options['connect']}"})
-        raise(ServerError, "failed to connect server socket to #{@options['connect']}") if connect_rc < 0
+        raise(ServerError, "failed to connect server socket to #{@options['connect']} (errno = #{ZMQ::Util.errno})") if connect_rc < 0
       else
         raise(ServerError, "must specify bind or connect address")
       end
@@ -56,7 +56,7 @@ module Zy
         debug({:server_socket => "ready to recv"})
         recv_rc = server_socket.recv_string(request_s)
         debug({:server_socket => "recvd (#{recv_rc}) #{request_s}"})
-        raise(ServerError, "server socket failed to recv") if recv_rc < 0
+        raise(ServerError, "server socket failed to recv (errno = #{ZMQ::Util.errno})") if recv_rc < 0
         request = Request.new(request_s)
         if request.error_status
           reply = {'status' => request.error_status}
@@ -67,7 +67,7 @@ module Zy
         debug({:server_socket => "sending #{reply_s}"})
         send_rc = server_socket.send_string(reply_s)
         debug({:server_socket => "sent (#{send_rc})"})
-        raise(ServerError, "server socket failed to send") if send_rc < 0
+        raise(ServerError, "server socket failed to send (errno = #{ZMQ::Util.errno})") if send_rc < 0
       end
     end
 
