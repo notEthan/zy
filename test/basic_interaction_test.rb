@@ -3,12 +3,16 @@ require 'helper'
 
 describe(Zy::Server) do
   before do
+    server = TCPServer.new('127.0.0.1', 0)
+    @server_port = server_port = server.addr[1]
+    server.close
+
     STDERR.puts "firing server"
     Thread.abort_on_exception = true
     @server_thread = Thread.new do
       Zy::Server.new(
         :app => proc { |request| {} },
-        :bind => 'inproc://zy_test',
+        :bind => "tcp://*:#{server_port}",
       ).start
     end
     STDERR.puts "fired server"
@@ -19,7 +23,7 @@ describe(Zy::Server) do
 
   let(:client_socket) do
     Zy.zmq_context.socket(ZMQ::REQ).tap do |client_socket|
-      client_socket.connect('inproc://zy_test')
+      client_socket.connect("tcp://localhost:#{@server_port}")
     end
   end
 
