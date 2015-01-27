@@ -40,4 +40,16 @@ describe(Zy::Server) do
     reply_s = request_s '{}'
     reply = JSON.parse(reply_s)
   end
+
+  it 'rejects non-json' do
+    reply_s = request_s('hello!')
+    reply = JSON.parse(reply_s)
+    assert_equal({'status' => ['error', 'request', 'not_json']}, reply)
+  end
+
+  it 'rejects non-object in json' do
+    reply_s = request_s('["a request"]')
+    reply = JSON.parse(reply_s)
+    assert_equal({'status' => ['error', 'request', 'not_object']}, reply)
+  end
 end
