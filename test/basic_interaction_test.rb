@@ -37,10 +37,19 @@ describe(Zy::Server) do
       send_rc = client_socket.send_string(request_s, flags)
       assert(send_rc >= 0)
     end
-    reply_s = ''
-    recv_rc = client_socket.recv_string(reply_s)
-    assert(recv_rc >= 0)
-    JSON.parse(reply_s)
+    reply_strings = []
+    more = true
+    while more
+      reply_message = ZMQ::Message.create || raise(ServerError, "failed to create message (errno = #{ZMQ::Util.errno})")
+      recv_rc = client_socket.recvmsg(reply_message)
+      assert(recv_rc >= 0)
+      reply_strings << reply_message.copy_out_string
+      reply_message.close
+      more = client_socket.more_parts?
+    end
+    assert_equal(2, reply_strings.size)
+    assert_equal('zy 0.0 json', reply_strings[0])
+    JSON.parse(reply_strings[1])
   end
 
   it 'requests and replies' do

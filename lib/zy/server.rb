@@ -66,19 +66,22 @@ module Zy
         end
         request = Request.new(request_strings)
         if request.error_status
-          reply = {'status' => request.error_status}
+          reply_obj = {'status' => request.error_status}
         else
           begin
-            reply = app.call(request)
+            reply_obj = app.call(request)
           rescue Exception => e
-            reply = {"status" => ["error", "server", "internal_error"]}
+            reply_obj = {"status" => ["error", "server", "internal_error"]}
           end
         end
-        reply_s = JSON.generate(reply)
-        debug({:server_socket => "sending #{reply_s}"})
-        send_rc = server_socket.send_string(reply_s)
-        debug({:server_socket => "sent (#{send_rc})"})
-        raise(ServerError, "server socket failed to send (errno = #{ZMQ::Util.errno})") if send_rc < 0
+        reply = Reply.from(reply_obj)
+        reply.reply_strings.each_with_index do |reply_s, i|
+          flags = i < reply.reply_strings.size - 1 ? ZMQ::SNDMORE : 0
+          debug({:server_socket => "sending #{reply_s} (flags=#{flags})"})
+          send_rc = server_socket.send_string(reply_s, flags)
+          debug({:server_socket => "sent (#{send_rc})"})
+          raise(ServerError, "server socket failed to send (errno = #{ZMQ::Util.errno})") if send_rc < 0
+        end
       end
     end
 

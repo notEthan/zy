@@ -33,4 +33,5 @@ module Zy
 
   autoload :Server, 'zy/server'
   autoload :Request, 'zy/request'
+  autoload :Reply, 'zy/reply'
 end
