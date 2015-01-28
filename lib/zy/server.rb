@@ -52,12 +52,19 @@ module Zy
       end
 
       loop do
-        request_s = ''
         debug({:server_socket => "ready to recv"})
-        recv_rc = server_socket.recv_string(request_s)
-        debug({:server_socket => "recvd (#{recv_rc}) #{request_s}"})
-        raise(ServerError, "server socket failed to recv (errno = #{ZMQ::Util.errno})") if recv_rc < 0
-        request = Request.new(request_s)
+        request_strings = []
+        more = true
+        while more
+          request_message = ZMQ::Message.create || raise(ServerError, "failed to create message (errno = #{ZMQ::Util.errno})")
+          recv_rc = server_socket.recvmsg(request_message)
+          debug({:server_socket => "recvd (#{recv_rc})"})
+          raise(ServerError, "server socket failed to recv (errno = #{ZMQ::Util.errno})") if recv_rc < 0
+          request_strings << request_message.copy_out_string
+          request_message.close
+          more = server_socket.more_parts?
+        end
+        request = Request.new(request_strings)
         if request.error_status
           reply = {'status' => request.error_status}
         else
