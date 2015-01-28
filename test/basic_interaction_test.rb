@@ -44,6 +44,34 @@ describe(Zy::Server) do
     reply = JSON.parse(reply_s)
   end
 
+  it 'internal server errors' do
+    server = TCPServer.new('127.0.0.1', 0)
+    server_port = server.addr[1]
+    server.close
+    Thread.abort_on_exception = true
+    server_thread = Thread.new do
+      Zy::Server.new(
+        :app => proc { |request| raise },
+        :bind => "tcp://*:#{server_port}",
+      ).start
+    end
+    client_socket = Zy.zmq_context.socket(ZMQ::REQ).tap do |client_socket|
+      client_socket.connect("tcp://localhost:#{server_port}")
+    end
+    request_strings = ['zy 0.0 json', '{}']
+    request_strings.each_with_index do |request_s, i|
+      flags = i < request_strings.size - 1 ? ZMQ::SNDMORE : 0
+      send_rc = client_socket.send_string(request_s, flags)
+      assert(send_rc >= 0)
+    end
+    reply_s = ''
+    recv_rc = client_socket.recv_string(reply_s)
+    assert(recv_rc >= 0)
+    reply = JSON.parse(reply_s)
+    assert_equal({'status' => ['error', 'server', 'internal_error']}, reply)
+    server_thread.kill
+  end
+
   it 'rejects non-json' do
     reply_s = request_s('zy 0.0 json', 'hello!')
     reply = JSON.parse(reply_s)

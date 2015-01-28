@@ -68,7 +68,11 @@ module Zy
         if request.error_status
           reply = {'status' => request.error_status}
         else
-          reply = app.call(request)
+          begin
+            reply = app.call(request)
+          rescue Exception => e
+            reply = {"status" => ["error", "server", "internal_error"]}
+          end
         end
         reply_s = JSON.generate(reply)
         debug({:server_socket => "sending #{reply_s}"})
