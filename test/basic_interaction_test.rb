@@ -40,12 +40,11 @@ describe(Zy::Server) do
     reply_s = ''
     recv_rc = client_socket.recv_string(reply_s)
     assert(recv_rc >= 0)
-    reply_s
+    JSON.parse(reply_s)
   end
 
   it 'requests and replies' do
     reply_s = request_s('zy 0.0 json', '{}')
-    reply = JSON.parse(reply_s)
   end
 
   describe 'internal server error' do
@@ -54,69 +53,58 @@ describe(Zy::Server) do
     end
 
     it 'internal server errors' do
-      reply_s = request_s('zy 0.0 json', '{}')
-      reply = JSON.parse(reply_s)
+      reply = request_s('zy 0.0 json', '{}')
       assert_equal({'status' => ['error', 'server', 'internal_error']}, reply)
     end
   end
 
   it 'rejects non-json' do
-    reply_s = request_s('zy 0.0 json', 'hello!')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy 0.0 json', 'hello!')
     assert_equal({'status' => ['error', 'request', 'not_json']}, reply)
   end
 
   it 'rejects non-object in json' do
-    reply_s = request_s('zy 0.0 json', '["a request"]')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy 0.0 json', '["a request"]')
     assert_equal({'status' => ['error', 'request', 'not_object']}, reply)
   end
 
   it 'rejects missing request frame' do
-    reply_s = request_s('zy 0.0 json')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy 0.0 json')
     assert_equal({'status' => ['error', 'request', 'request_not_specified']}, reply)
   end
 
   it 'rejects too many frames' do
-    reply_s = request_s('zy 0.0 json', '{}', '{}')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy 0.0 json', '{}', '{}')
     assert_equal({'status' => ['error', 'request', 'too_many_frames']}, reply)
   end
 
   it 'rejects missing format' do
-    reply_s = request_s('zy 0.0', '{}')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy 0.0', '{}')
     assert_equal({'status' => ['error', 'protocol', 'format_not_specified']}, reply)
   end
 
   it 'rejects missing version' do
-    reply_s = request_s('zy', '{}')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy', '{}')
     assert_equal({'status' => ['error', 'protocol', 'version_not_specified']}, reply)
   end
 
   it 'rejects missing protocol' do
-    reply_s = request_s('', '{}')
-    reply = JSON.parse(reply_s)
+    reply = request_s('', '{}')
     assert_equal({'status' => ['error', 'protocol', 'protocol_name_not_specified']}, reply)
   end
 
   it 'rejects unrecognized format' do
-    reply_s = request_s('zy 0.0 xml', '{}')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy 0.0 xml', '{}')
     assert_equal({'status' => ['error', 'protocol', 'format_not_supported']}, reply)
   end
 
   it 'rejects unsupported version' do
-    reply_s = request_s('zy 9.0 json', '{}')
-    reply = JSON.parse(reply_s)
+    reply = request_s('zy 9.0 json', '{}')
     assert_equal({'status' => ['error', 'protocol', 'version_not_supported']}, reply)
   end
 
   it 'rejects wrong protocol' do
-    reply_s = request_s('http 0.0 json', '{}')
-    reply = JSON.parse(reply_s)
+    reply = request_s('http 0.0 json', '{}')
     assert_equal({'status' => ['error', 'protocol', 'protocol_not_supported']}, reply)
   end
 end
