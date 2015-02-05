@@ -61,6 +61,7 @@ module Zy
           debug({:server_socket => "recvd (#{recv_rc})"})
           raise(ServerError, "server socket failed to recv (errno = #{ZMQ::Util.errno})") if recv_rc < 0
           request_strings << request_message.copy_out_string
+          debug({:server_socket => "copied #{request_strings.last}"})
           request_message.close
           more = server_socket.more_parts?
         end
