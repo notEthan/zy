@@ -63,5 +63,9 @@ module Zy
 
     attr_reader :error_status
     attr_reader :object
+
+    def [](key)
+      @object[key]
+    end
   end
 end
