@@ -72,6 +72,7 @@ module Zy
           begin
             reply_obj = app.call(request)
           rescue Exception => e
+            debug({exception: {class: e.class, message: e.message, backtrace: e.backtrace}})
             reply_obj = {"status" => ["error", "server", "internal_error"]}
           end
         end
