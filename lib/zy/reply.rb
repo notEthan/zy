@@ -11,7 +11,20 @@ module Zy
     end
 
     def reply_strings
-      @reply_strings ||= ['zy 0.0 json', JSON.generate(@object)]
+      @reply_strings ||= [protocol_string, reply_string]
+    end
+
+    def protocol_string
+      'zy 0.0 json'
+    end
+
+    def reply_string
+      begin
+        JSON.generate(@object)
+      rescue JSON::GeneratorError
+        # TODO log debug
+        JSON.generate({"status" => ["error", "server", "internal_error"]})
+      end
     end
   end
 end

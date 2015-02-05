@@ -67,6 +67,17 @@ describe(Zy::Server) do
     end
   end
 
+  describe 'reply object not jsonable' do
+    let(:app) do
+      proc { |request| Object.new }
+    end
+
+    it 'internal server errors' do
+      reply = request_s('zy 0.0 json', '{}')
+      assert_equal({'status' => ['error', 'server', 'internal_error']}, reply)
+    end
+  end
+
   it 'rejects non-json' do
     reply = request_s('zy 0.0 json', 'hello!')
     assert_equal({'status' => ['error', 'request', 'not_json']}, reply)
