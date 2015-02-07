@@ -30,7 +30,7 @@ module Zy
         debug({:server_socket => {:curve => 'set to server'}})
         raise(ServerError, "failed to set server socket to curve server (errno = #{ZMQ::Util.errno})") if rc < 0
         debug({:server_socket => {:curve => 'setting private key'}})
-        server_socket.setsockopt(ZMQ::CURVE_SECRETKEY, @options['server_private_key'])
+        rc = server_socket.setsockopt(ZMQ::CURVE_SECRETKEY, @options['server_private_key'])
         debug({:server_socket => {:curve => 'set private key'}})
         raise(ServerError, "failed to set server socket curve secret key (errno = #{ZMQ::Util.errno})") if rc < 0
       else
