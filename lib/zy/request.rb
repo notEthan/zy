@@ -54,7 +54,7 @@ module Zy
         begin
           @object = JSON.parse(@request_string)
         rescue JSON::ParserError
-          throw(:error, ['error', 'request', 'not_json'])
+          throw(:error, ['error', 'request', 'not_in_specified_format'])
         end
 
         throw(:error, ['error', 'request', 'not_object']) unless @object.is_a?(Hash)

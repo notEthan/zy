@@ -80,7 +80,7 @@ describe(Zy::Server) do
 
   it 'rejects non-json' do
     reply = request_s('zy 0.0 json', 'hello!')
-    assert_equal({'status' => ['error', 'request', 'not_json']}, reply)
+    assert_equal({'status' => ['error', 'request', 'not_in_specified_format']}, reply)
   end
 
   it 'rejects non-object in json' do
