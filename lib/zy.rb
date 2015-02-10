@@ -46,4 +46,5 @@ module Zy
   autoload :Request, 'zy/request'
   autoload :Reply, 'zy/reply'
   autoload :Natra, 'zy/natra'
+  autoload :Middleware, 'zy/middleware'
 end
