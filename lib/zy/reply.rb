@@ -8,6 +8,7 @@ module Zy
 
     def initialize(object)
       @object = object
+      @on_complete = []
     end
 
     def reply_strings
@@ -25,6 +26,14 @@ module Zy
         # TODO log debug
         JSON.generate({"status" => ["error", "server", "internal_error"]})
       end
+    end
+
+    def on_complete(&block)
+      @on_complete << block
+    end
+
+    def complete
+      @on_complete.map(&:call)
     end
   end
 end

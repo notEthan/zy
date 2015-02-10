@@ -84,6 +84,7 @@ module Zy
           debug({:server_socket => "sent (#{send_rc})"})
           raise(ServerError, "server socket failed to send (errno = #{ZMQ::Util.errno})") if send_rc < 0
         end
+        reply.complete
       end
     end
 
