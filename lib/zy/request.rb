@@ -2,6 +2,8 @@ require 'json'
 
 module Zy
   class Request
+    FIELDS = %w(body resource action params).map(&:freeze).freeze
+
     def initialize(request_strings)
       @request_strings = request_strings
       @error_status = catch(:error) do
@@ -63,9 +65,14 @@ module Zy
 
     attr_reader :error_status
     attr_reader :object
+    attr_reader :protocol_string
 
     def [](key)
       @object[key]
+    end
+
+    FIELDS.map do |key|
+      define_method(key) { self[key] }
     end
   end
 end
