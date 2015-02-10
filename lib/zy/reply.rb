@@ -15,7 +15,7 @@ module Zy
     end
 
     def protocol_string
-      'zy 0.0 json'
+      Zy::Protocol::STRING
     end
 
     def reply_string

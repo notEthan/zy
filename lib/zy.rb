@@ -6,6 +6,15 @@ require 'ffi-rzmq'
 require 'json'
 
 module Zy
+  module Protocol
+    NAME = 'zy'.freeze
+    VERSION = '0.0'.freeze
+    FORMAT = 'json'.freeze
+
+    PARTS = [NAME, VERSION, FORMAT].freeze
+    STRING = PARTS.join(' ').freeze
+  end
+
   class Error < StandardError
   end
 
