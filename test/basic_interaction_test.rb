@@ -127,4 +127,18 @@ describe(Zy::Server) do
     reply = request_s('http 0.0 json', '{}')
     assert_equal({'status' => ['error', 'protocol', 'protocol_not_supported']}, reply)
   end
+
+  describe('reply') do
+    describe('callback') do
+      let(:calls) { {} }
+      let(:app) do
+        calls[:complete] = false
+        proc { |request| Zy::Reply.from({}).tap { |reply| reply.on_complete { calls[:complete] = true } } }
+      end
+      it('completes') do
+        request_s('zy 0.0 json', '{}')
+        assert calls[:complete]
+      end
+    end
+  end
 end
