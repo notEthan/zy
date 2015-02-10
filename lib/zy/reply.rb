@@ -24,7 +24,7 @@ module Zy
         JSON.generate(@object)
       rescue JSON::GeneratorError
         # TODO log debug
-        JSON.generate({"status" => ["error", "server", "internal_error"]})
+        JSON.generate({'status' => ['error', 'server', 'internal_error']})
       end
     end
 
