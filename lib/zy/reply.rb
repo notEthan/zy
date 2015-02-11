@@ -31,7 +31,7 @@ module Zy
       begin
         JSON.generate(@object)
       rescue JSON::GeneratorError
-        # TODO log debug
+        error({'reply' => "could not generate JSON for #{@object.inspect}"})
         JSON.generate({'status' => ['error', 'server', 'internal_error']})
       end
     end
