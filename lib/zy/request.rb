@@ -2,9 +2,13 @@ require 'json'
 
 module Zy
   class Request
+    include Zy::Logger
+
     FIELDS = %w(body resource action params).map(&:freeze).freeze
 
-    def initialize(request_strings)
+    def initialize(request_strings, options = {})
+      @options = options.map { |k,v| {k.is_a?(Symbol) ? k.to_s : k => v} }.inject({}, &:update)
+
       @request_strings = request_strings
       @error_status = catch(:error) do
         # this should not happen; it's not possible to get a 0-frame message in zmq

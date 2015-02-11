@@ -3,6 +3,8 @@ module Zy
   end
 
   class Server
+    include Zy::Logger
+
     # options may include:
     #
     # - app
@@ -70,7 +72,7 @@ module Zy
           request_message.close
           more = server_socket.more_parts?
         end
-        request = Request.new(request_strings)
+        request = Request.new(request_strings, 'logger' => logger)
         if request.error_status
           reply_obj = {'status' => request.error_status}
         else
@@ -81,7 +83,7 @@ module Zy
             reply_obj = {'status' => ['error', 'server', 'internal_error']}
           end
         end
-        reply = Reply.from(reply_obj)
+        reply = Reply.from(reply_obj, 'logger' => logger)
         reply.reply_strings.each_with_index do |reply_s, i|
           flags = i < reply.reply_strings.size - 1 ? ZMQ::SNDMORE : 0
           debug({:server_socket => "sending #{reply_s} (flags=#{flags})"})
@@ -91,17 +93,6 @@ module Zy
         end
         reply.complete
       end
-    end
-
-    def logger
-      @logger ||= @options['logger'] || begin
-        require 'logger'
-        ::Logger.new(STDOUT)
-      end
-    end
-
-    def debug(message)
-      logger.debug JSON.generate message
     end
   end
 end

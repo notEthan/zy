@@ -1,14 +1,18 @@
 module Zy
   class Reply
+    include Zy::Logger
+
     FIELDS = %w(status body).map(&:freeze).freeze
 
     class << self
-      def from(reply_object)
-        reply_object.is_a?(self) ? reply_object : new(reply_object)
+      def from(reply_object, options = {})
+        reply_object.is_a?(self) ? reply_object : new(reply_object, options)
       end
     end
 
-    def initialize(object)
+    def initialize(object, options = {})
+      @options = options.map { |k,v| {k.is_a?(Symbol) ? k.to_s : k => v} }.inject({}, &:update)
+
       @object = object
       @on_complete = []
     end

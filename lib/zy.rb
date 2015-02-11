@@ -37,4 +37,5 @@ module Zy
   autoload :Reply, 'zy/reply'
   autoload :Natra, 'zy/natra'
   autoload :Middleware, 'zy/middleware'
+  autoload :Logger, 'zy/logger'
 end
