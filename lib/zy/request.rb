@@ -10,6 +10,9 @@ module Zy
       @options = options.map { |k,v| {k.is_a?(Symbol) ? k.to_s : k => v} }.inject({}, &:update)
 
       @request_strings = request_strings
+      unless request_strings.is_a?(Array) && request_strings.all? { |s| s.is_a?(String) }
+        raise(ArgumentError, "request_strings must be an Array of Strings; got #{request_strings.inspect}")
+      end
       @error_status = catch(:error) do
         # this should not happen; it's not possible to get a 0-frame message in zmq
         throw(:error, ['error', 'request', 'no_frames']) if @request_strings.size < 1
