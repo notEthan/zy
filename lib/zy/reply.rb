@@ -68,6 +68,18 @@ module Zy
       end
     end
 
+    def success?
+      status && status.is_a?(Array) && status[0] == 'success'
+    end
+
+    def request_error?
+      status && status.is_a?(Array) && status[0..1] == ['error', 'request']
+    end
+
+    def server_error?
+      status && status.is_a?(Array) && status[0..1] == ['error', 'server']
+    end
+
     def on_complete(&block)
       @on_complete << block
     end
