@@ -51,6 +51,11 @@ module Zy
         raise(ServerError, "must specify bind or connect address")
       end
 
+      trap("INT") do
+        STDERR.puts "goodbye!"
+        exit 0
+      end
+
       loop do
         debug({:server_socket => "ready to recv"})
         request_strings = []

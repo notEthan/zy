@@ -20,17 +20,7 @@ module Zy
 
   class << self
     def zmq_context
-      @zmq_context ||= begin
-        ZMQ::Context.new.tap do |zmq_context|
-          trap("INT") do
-            STDERR.puts "goodbye!"
-            zmq_context.terminate
-            STDERR.puts "ok exiting"
-            exit 0
-            STDERR.puts "done"
-          end
-        end
-      end
+      @zmq_context ||= ZMQ::Context.new
     end
 
     def zmq_context=(zmq_context)
