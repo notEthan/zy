@@ -21,6 +21,53 @@ module Zy
     end
 
     def start
+      # start up a ZAP server if specified
+      if @options['zap_app']
+        Thread.new do
+          zap_server = Zy::ZAP::Server.new(
+            'logger' => logger,
+            'zap_app' => @options['zap_app'],
+          )
+          zap_server.start
+        end
+
+        # this makes a blocking request to the ZAP server, preventing 
+        # the app server from starting up before the ZAP server is up
+        debug({:zap_client_socket => 'creating'})
+        zap_client_socket = Zy.zmq_context.socket(ZMQ::REQ)
+        debug({:zap_client_socket => 'created (ZMQ::REQ)'})
+        raise(ZAP::Server::Error, "failed to create client socket") unless zap_client_socket
+
+        debug({:zap_client_socket => "connecting #{ZAP::ENDPOINT}"})
+        connect_rc = zap_client_socket.connect(ZAP::ENDPOINT)
+        debug({:zap_client_socket => "connected #{ZAP::ENDPOINT}"})
+        raise(Zy::Server::Error, "failed to connect ZAP client socket to #{ZAP::ENDPOINT} (errno = #{ZMQ::Util.errno})") if connect_rc < 0
+        
+        # send a fake sort of a ZAP request
+        request_strings = [ZAP::VERSION, '0', '', '127.0.0.1', '', 'NULL']
+        request_strings.each_with_index do |request_s, i|
+          flags = i < request_strings.size - 1 ? ZMQ::SNDMORE : 0
+          debug({:zap_client_socket => "sending #{request_s} (flags=#{flags})"})
+          send_rc = zap_client_socket.send_string(request_s, flags)
+          debug({:zap_client_socket => "sent (#{send_rc})"})
+          raise(Zy::Server::Error, "ZAP client socket failed to send (errno = #{ZMQ::Util.errno})") if send_rc < 0
+        end
+
+        # read a reply - don't care about the contents, just want to know ZAP is responsive 
+        reply_strings = []
+        more = true
+        while more
+          reply_message = ZMQ::Message.create || raise(Zy::Server::Error, "failed to create message (errno = #{ZMQ::Util.errno})")
+          recv_rc = zap_client_socket.recvmsg(reply_message)
+          debug({:zap_client_socket => "recvd (#{recv_rc})"})
+          raise(Zy::Server::Error, "zap client socket failed to recv (errno = #{ZMQ::Util.errno})") if recv_rc < 0
+          reply_strings << reply_message.copy_out_string
+          debug({:zap_client_socket => "copied #{reply_strings.last}"})
+          reply_message.close
+          more = zap_client_socket.more_parts?
+        end
+      end
+
       debug({:server_socket => 'creating'})
       server_socket = Zy.zmq_context.socket(ZMQ::REP)
       debug({:server_socket => 'created (ZMQ::REP)'})
