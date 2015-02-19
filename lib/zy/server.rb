@@ -24,6 +24,7 @@ module Zy
       # start up a ZAP server if specified
       if @options['zap_app']
         Thread.new do
+          Thread.current.abort_on_exception = true
           zap_server = Zy::ZAP::Server.new(
             'logger' => logger,
             'zap_app' => @options['zap_app'],
