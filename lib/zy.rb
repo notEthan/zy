@@ -35,6 +35,7 @@ module Zy
   autoload :Server, 'zy/server'
   autoload :Request, 'zy/request'
   autoload :Reply, 'zy/reply'
+  autoload :ZAP, 'zy/zap'
   autoload :Natra, 'zy/natra'
   autoload :Middleware, 'zy/middleware'
   autoload :Logger, 'zy/logger'
