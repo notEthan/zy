@@ -56,9 +56,10 @@ module Zy
           'processing' => {
             'began_at' => began_at.utc.to_f,
             'duration' => now - began_at,
-            'activesupport_tagged_logging_tags' => log_tags,
           }
         }
+        data['processing']['activesupport_tagged_logging_tags'] = log_tags if log_tags
+
         json_data = JSON.dump(data)
         dolog = proc do
           now_s = now.strftime('%Y-%m-%d %H:%M:%S %Z')
