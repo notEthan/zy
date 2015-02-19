@@ -40,7 +40,7 @@ describe(Zy::Server) do
     reply_strings = []
     more = true
     while more
-      reply_message = ZMQ::Message.create || raise(ServerError, "failed to create message (errno = #{ZMQ::Util.errno})")
+      reply_message = ZMQ::Message.create || raise(Zy::Server::Error, "failed to create message (errno = #{ZMQ::Util.errno})")
       recv_rc = client_socket.recvmsg(reply_message)
       assert(recv_rc >= 0)
       reply_strings << reply_message.copy_out_string
