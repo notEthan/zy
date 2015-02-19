@@ -72,7 +72,7 @@ module Zy
       debug({:server_socket => 'creating'})
       server_socket = Zy.zmq_context.socket(ZMQ::REP)
       debug({:server_socket => 'created (ZMQ::REP)'})
-      raise(Zy::Server::Error, "failed to create socket") unless server_socket
+      raise(Zy::Server::Error, "failed to create server socket") unless server_socket
 
       if @options['server_private_key']
         debug({:server_socket => {:curve => 'setting to server'}})
