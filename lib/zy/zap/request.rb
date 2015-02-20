@@ -92,7 +92,7 @@ module Zy
       # the Z85-encoded client key
       def client_key_85
         out = "\0" * (client_key.size * 5 / 4 + 1)
-        LibZMQ.zmq_z85_encode out, client_key, client_key.size
+        LibZMQ.zmq_z85_encode(out, client_key, client_key.size)
       end
     end
 
