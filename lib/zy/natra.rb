@@ -41,7 +41,7 @@ module Zy
       end
 
       if handler
-        handler.call(request)
+        catch(:reply) { handler.call(request) }
       else
         {'status' => ['error', 'request', 'unroutable']}
       end
