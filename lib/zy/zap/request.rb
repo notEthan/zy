@@ -56,8 +56,8 @@ module Zy
         ERROR_STATUS = {
           'text'.freeze => 'ERROR'.freeze,
           'code'.freeze => '500'.freeze,
-        },
-      ]
+        }.freeze,
+      ].freeze
 
       def reply(status)
         unless status.is_a?(Hash)
